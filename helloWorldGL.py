@@ -11,9 +11,22 @@ from OpenGL.GLU import *
 from OpenGL.GL import *
 import sys
 
-winWidth = 640
-winHeight = 480
-name = b'Hello World!'
+# These parameters define the camera's lens shape
+CAM_NEAR = 0.01
+CAM_FAR = 1000.0
+CAM_ANGLE = 60.0
+
+# These parameters define simple animation properties
+MIN_STEP = 0.1
+DEFAULT_STEP = 0.001
+ANGLE_STEP = DEFAULT_STEP
+FPS = 60.0
+DELAY = int(1000.0 / FPS + 0.5)
+
+# Global variables
+winWidth = 1000
+winHeight = 1000
+name = b'Wireframe Scene!'
 
 def main():
     # Create the initial window
@@ -45,6 +58,8 @@ def init():
 # Callback function used to display the scene
 # Currently it just draws a simple polyline (LINE_STRIP)
 def display():
+
+    glViewport(0,0, winWidth, winHeight)
     glClearColor(1.0, 1.0, 1.0, 0.0)
     glClear(GL_COLOR_BUFFER_BIT)
 
