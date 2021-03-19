@@ -36,8 +36,8 @@ animate = False
 angleMovement = 0
 perspectiveMode = True
 fire = False
-bulletDistance = 0
-BULLET_SPEED = 0.5
+# bulletDistance = 0
+# BULLET_SPEED = 0.5
 
 
 def main():
@@ -65,12 +65,16 @@ def main():
 
 
 def init():
-    global tube, ball #You name these yourself
-    tube = gluNewQuadric()
+    global tube, ball, cone, cone2 #You name these yourself
+    # tube = gluNewQuadric()
+    cone = gluNewQuadric()
+    cone2 = gluNewQuadric()
     # gluQuadricDrawStyle(tube, GLU_LINE) makes a cone
-    gluQuadricDrawStyle(tube, GLU_LINE)
-    ball = gluNewQuadric()
-    gluQuadricDrawStyle(ball, GLU_LINE)
+    gluQuadricDrawStyle(cone, GLU_LINE)
+    gluQuadricDrawStyle(cone2, GLU_LINE)
+    #gluQuadricDrawStyle(tube, GLU_LINE)
+   # ball = gluNewQuadric()
+   # gluQuadricDrawStyle(ball, GLU_LINE)
 
 
 # Callback function used to display the scene
@@ -122,11 +126,11 @@ def advance():
         angleMovement -= 360  # So doesn't get too large
     elif angleMovement < 0:
         angleMovement += 360
-    if fire:
-        bulletDistance += BULLET_SPEED
-        if bulletDistance > CAM_FAR:
-            bulletDistance = 0
-            fire = False
+    # if fire:
+    #     bulletDistance += BULLET_SPEED
+    #     if bulletDistance > CAM_FAR:
+    #         bulletDistance = 0
+    #         fire = False
 
 
 def specialKeys(key, x, y):
@@ -175,12 +179,21 @@ def drawScene():
 def draw():
     glPushMatrix()
     # quadric, base r, top r, height (along z), slices (around), stacks (towards height)
-    gluCylinder(tube, 3, 3, 10, 40, 5)
-    gluCylinder(tube, 3, 1, 10, 10, 5)
+    #gluCylinder(tube, 3, 3, 10, 40, 5)
     glPushMatrix()
-    glTranslated(0, 0, bulletDistance)
-    glScaled(1, 1, 2)
-    gluSphere(ball, 0.9, 10, 10)
+    glTranslated(-1, -7, -10)
+    glRotated(-90, 1, 0, 0)
+    gluCylinder(cone, 3, 0.25, 10, 10, 10)
+    
+    glPushMatrix()
+    glTranslated(-1, -8, -11)
+    glRotated(-90, 1, 0, 0)
+    gluCylinder(cone2, 3, 0.25, 10, 10, 10)
+
+    #glTranslated(0, 0, bulletDistance)
+    #glScaled(1, 1, 2)
+    # gluSphere(ball, 0.9, 10, 10)
+    glPopMatrix()
     glPopMatrix()
     glPopMatrix()
 
