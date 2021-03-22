@@ -180,21 +180,63 @@ def draw():
     glPushMatrix()
     # quadric, base r, top r, height (along z), slices (around), stacks (towards height)
     #gluCylinder(tube, 3, 3, 10, 40, 5)
-    glPushMatrix()
-    glTranslated(-1, -7, -10)
-    glRotated(-90, 1, 0, 0)
-    gluCylinder(cone, 3, 0.25, 10, 10, 10)
-    
-    glPushMatrix()
-    glTranslated(-1, -8, -11)
-    glRotated(-90, 1, 0, 0)
-    gluCylinder(cone2, 3, 0.25, 10, 10, 10)
 
-    #glTranslated(0, 0, bulletDistance)
-    #glScaled(1, 1, 2)
-    # gluSphere(ball, 0.9, 10, 10)
+    #cone1
+    glPushMatrix()
+    glTranslated(0, -5, -5)
+    glRotated(-90, 1, 0, 0)
+    gluCylinder(cone2, 1, 0.25, 5, 10, 10)
     glPopMatrix()
+
+    #cone2
+    glPushMatrix()
+    glTranslated(0, -5, 5)
+    glRotated(-90, 1, 0, 0)
+    gluCylinder(cone2, 1, 0.25, 5, 10, 10)
     glPopMatrix()
+
+    #car body
+    glPushMatrix()
+    glTranslated(0, -4, 0)
+    glScaled(5, 1, 3)
+    glutWireCube(1.0)
+    glPopMatrix()
+
+    #car fronty thingy
+    glPushMatrix()
+    glTranslated(1.5, -3, 0)
+    glScaled(1, 1, 3)
+    glutWireCube(1.0)
+    glPopMatrix()
+
+    #tire front right
+    glPushMatrix()
+    glTranslated(1.5, -4, 1.5)
+    glRotated(0, 1, 0, 0)
+    gluCylinder(cone2, .5, .5, .5, 20, 5)
+    glPopMatrix()
+
+    #tire front left
+    glPushMatrix()
+    glTranslated(1.5, -4, -2)
+    glRotated(0, 1, 0, 0)
+    gluCylinder(cone2, .5, .5, .5, 20, 5)
+    glPopMatrix()
+
+    #tire back right
+    glPushMatrix()
+    glTranslated(-1.5, -4, 1.5)
+    glRotated(0, 1, 0, 0)
+    gluCylinder(cone2, .5, .5, .5, 20, 5)
+    glPopMatrix()
+
+    #tire back left
+    glPushMatrix()
+    glTranslated(-1.5, -4, -2)
+    glRotated(0, 1, 0, 0)
+    gluCylinder(cone2, .5, .5, .5, 20, 5)
+    glPopMatrix()
+
     glPopMatrix()
 
 
