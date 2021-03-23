@@ -27,7 +27,8 @@ ANGLE_STEP = DEFAULT_STEP
 FPS = 60.0
 DELAY = int(1000.0 / FPS + 0.5)
 
-# Global (Module) Variables (ARGH!) Some are from the
+
+# Global (Module) Variables 
 winWidth = 1000
 winHeight = 1000
 name = b'Shapes...'
@@ -35,10 +36,15 @@ step = MIN_STEP
 animate = False
 angleMovement = 0
 perspectiveMode = True
-fire = False
-# bulletDistance = 0
-# BULLET_SPEED = 0.5
 
+#Car animation/ Wheel animation global variables
+#Dis=Displacement
+carPosX = 0
+carDis = 0.05
+wheelRotation = 0
+wheelDis = -1.8
+MAX_BOUND = 5
+MIN_BOUND = -5
 
 def main():
     # Create the initial window
@@ -61,20 +67,18 @@ def main():
     glutMainLoop()
     return
 
-# Any initialization material to do... such as shapes
 
 
 def init():
-    global tube, ball, cone, cone2 #You name these yourself
-    # tube = gluNewQuadric()
+    global cone, cone2, wheel
+    # Cones for 
     cone = gluNewQuadric()
     cone2 = gluNewQuadric()
-    # gluQuadricDrawStyle(tube, GLU_LINE) makes a cone
+    wheel = gluNewQuadric()
+    
     gluQuadricDrawStyle(cone, GLU_LINE)
     gluQuadricDrawStyle(cone2, GLU_LINE)
-    #gluQuadricDrawStyle(tube, GLU_LINE)
-   # ball = gluNewQuadric()
-   # gluQuadricDrawStyle(ball, GLU_LINE)
+    gluQuadricDrawStyle(wheel, GLU_LINE)
 
 
 # Callback function used to display the scene
@@ -116,21 +120,20 @@ def timer(alarm):
         advance()
         glutPostRedisplay()
 
-# Advance the scene one frame
-
-
+# Controls the animation. Advances the scene by a single frame
 def advance():
-    global angleMovement, bulletDistance, fire
-    angleMovement += ANGLE_STEP
-    if angleMovement >= 360:
-        angleMovement -= 360  # So doesn't get too large
-    elif angleMovement < 0:
-        angleMovement += 360
-    # if fire:
-    #     bulletDistance += BULLET_SPEED
-    #     if bulletDistance > CAM_FAR:
-    #         bulletDistance = 0
-    #         fire = False
+    #Gloabl variable call to get car and wheel x value, displacement modifier, and angle modifier
+    #Gets the min and max values for the displacment
+    global carPosX, carDis, MAX_BOUND, MIN_BOUND, wheelDis, wheelRotation
+    
+    #Moves the car and wheels 
+    carPosX += carDis
+    wheelRotation += wheelDis
+    if(carPosX>MAX_BOUND or carPosX<MIN_BOUND):
+        carDis *= -1
+        wheelDis *= -1
+    glutPostRedisplay()
+            
 
 
 def specialKeys(key, x, y):
@@ -143,15 +146,10 @@ def specialKeys(key, x, y):
         angleMovement -= ANGLE_STEP
     glutPostRedisplay()
 
-# Callback function used to handle any key events
-# Currently, it just responds to the ESC key (which quits)
-# key: ASCII value of the key that was pressed
-# x,y: Location of the mouse (in the window) at time of key press)
-
-
+# Defines Keyboard controls (Space bar starts animation)
 def keyboard(key, x, y):
     global angleMovement
-    if ord(key) == 27:  # ASCII code 27 = ESC-key
+    if ord(key) == 27:  
         glutLeaveMainLoop()
     elif ord(key) == ord(' '):
         global animate
@@ -159,28 +157,17 @@ def keyboard(key, x, y):
 
 
 def drawScene():
-    """
-    * drawScene:
-    *    Draws a simple scene with a few shapes
-    """
+    
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    glTranslate(0, -3, -20)   # Move world coordinate system so it is in view
-    glRotated(angleMovement, 0, 1, 0)  # Spin around y-axis
-    # Controls wireframe color. (1,1,1) = WHITE. (0,0,0) = BLACK
+    glTranslate(0, -3, -20)
+    glRotated(angleMovement, 0, 1, 0) 
     glColor3f(0, 0, 0)
     draw()
 
-# Draw the entire scene - house + coordinate frame
-
-# Where our design will be drawn
-
-
 def draw():
     glPushMatrix()
-    # quadric, base r, top r, height (along z), slices (around), stacks (towards height)
-    #gluCylinder(tube, 3, 3, 10, 40, 5)
-
+   
     #cone1
     glPushMatrix()
     glTranslated(0, -5, -5)
@@ -197,44 +184,44 @@ def draw():
 
     #car body
     glPushMatrix()
-    glTranslated(0, -4, 0)
+    glTranslated(carPosX, -4, 0)
     glScaled(5, 1, 3)
     glutWireCube(1.0)
     glPopMatrix()
 
-    #car fronty thingy
+    #car bar
     glPushMatrix()
-    glTranslated(1.5, -3, 0)
+    glTranslated(carPosX + 1.5, -3, 0)
     glScaled(1, 1, 3)
     glutWireCube(1.0)
     glPopMatrix()
 
     #tire front right
     glPushMatrix()
-    glTranslated(1.5, -4, 1.5)
-    glRotated(0, 1, 0, 0)
-    gluCylinder(cone2, .5, .5, .5, 20, 5)
+    glTranslated(carPosX + 1.5, -4, 1.5)
+    glRotated(wheelRotation, 0, 0, 1)
+    gluCylinder(wheel, .5, .5, .5, 20, 5)
     glPopMatrix()
 
     #tire front left
     glPushMatrix()
-    glTranslated(1.5, -4, -2)
-    glRotated(0, 1, 0, 0)
-    gluCylinder(cone2, .5, .5, .5, 20, 5)
+    glTranslated(carPosX + 1.5, -4, -2)
+    glRotated(wheelRotation, 0, 0, 1)
+    gluCylinder(wheel, .5, .5, .5, 20, 5)
     glPopMatrix()
 
     #tire back right
     glPushMatrix()
-    glTranslated(-1.5, -4, 1.5)
-    glRotated(0, 1, 0, 0)
-    gluCylinder(cone2, .5, .5, .5, 20, 5)
+    glTranslated(carPosX +  -1.5, -4, 1.5)
+    glRotated(wheelRotation, 0, 0, 1)
+    gluCylinder(wheel, .5, .5, .5, 20, 5)
     glPopMatrix()
 
     #tire back left
     glPushMatrix()
-    glTranslated(-1.5, -4, -2)
-    glRotated(0, 1, 0, 0)
-    gluCylinder(cone2, .5, .5, .5, 20, 5)
+    glTranslated(carPosX +  -1.5, -4, -2)
+    glRotated(wheelRotation, 0, 0, 1)
+    gluCylinder(wheel, .5, .5, .5, 20, 5)
     glPopMatrix()
 
     glPopMatrix()
