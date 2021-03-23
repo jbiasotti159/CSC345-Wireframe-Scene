@@ -1,12 +1,9 @@
 # ==============================
-# Christian Duncan
+# James Jacobson, Neel Bains, Jill Biasotti, Joe Ruiz, Julia Wilkinson, Lauren Atkinson
 # CSC345: Computer Graphics
 #   Spring 2021
 # Description:
-#   Demonstrates use of gluCylinder and gluSphere to draw
-#   3-d objects.
-#
-# THIS FILE IS FOR REFERENCE/STUDY ONLY!!!
+#   Assignment 2 for graphics: Creating car animation with 2 cones and a moving camera
 # ==============================
 
 from OpenGL.GLUT import *
@@ -14,31 +11,31 @@ from OpenGL.GLU import *
 from OpenGL.GL import *
 import sys
 
-# These parameters define the camera's lens shape
+# Camera's lens shape
 CAM_NEAR = 0.01
 CAM_FAR = 1000.0
 CAM_ANGLE = 60.0
 
-# These parameters define simple animation properties
+# Simple animation properties
 MIN_STEP = 0.1
-# Controls the rotation speed, how much camera rotation will increment by
+# Controls camera rotation speed
 DEFAULT_STEP = 0.2
 ANGLE_STEP = DEFAULT_STEP
 FPS = 60.0
 DELAY = int(1000.0 / FPS + 0.5)
 
 
-# Global (Module) Variables 
+# Global Variables 
 winWidth = 1000
 winHeight = 1000
-name = b'Shapes...'
+name = b'Car...'
 step = MIN_STEP
 animate = False
 angleMovement = 0
 perspectiveMode = True
 
-#Car animation/ Wheel animation global variables
-#Dis=Displacement
+# Car animation/ Wheel animation global variables
+# Dis = Displacement
 carPosX = 0
 carDis = 0.05
 wheelRotation = 0
@@ -56,22 +53,22 @@ def main():
 
     init()
 
-    # Setup the callback returns for display and keyboard events
+    # Callback returns for display and keyboard events
     glutDisplayFunc(display)
     glutKeyboardFunc(keyboard)
     glutSpecialFunc(specialKeys)
     glutTimerFunc(0, timer, DELAY)
 
-    # Enters the main loop.
-    # Displays the window and starts listening for events.
+    # Enters main loop.
+    # Displays window and starts listening for events.
     glutMainLoop()
     return
 
 
-
+# Creates shapes for scenes
 def init():
     global cone, cone2, wheel
-    # Cones for 
+    # Quadraic for both cones, and wheels
     cone = gluNewQuadric()
     cone2 = gluNewQuadric()
     wheel = gluNewQuadric()
@@ -81,61 +78,56 @@ def init():
     gluQuadricDrawStyle(wheel, GLU_LINE)
 
 
-# Callback function used to display the scene
-# Currently it just draws a simple polyline (LINE_STRIP)
+# Callback function for displaying the scene
 def display():
-    # Set the viewport to the full screen
-    # For Mac: Multiply window width & height by 2
     glViewport(0, 0, 2*winWidth, 2*winHeight)
 
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     if perspectiveMode:
-        # Set view to Perspective Proj. (angle, aspect ratio, near/far planes)
         gluPerspective(CAM_ANGLE, winWidth/winHeight, CAM_NEAR, CAM_FAR)
     else:
         glOrtho(-winWidth/40, winWidth/40, -
                 winHeight/40, winHeight/40, -100, 100)
 
-    # Clear the Screen
-    # Clears the screen with white, speficially white
+    # Clears the screen with white
     glClearColor(1.0, 1.0, 1.0, 0.0)
     glClear(GL_COLOR_BUFFER_BIT)
 
-    # And draw the "Scene"
+    # And draw the "Scene" in black
     glColor3f(1.0, 1.0, 1.0)
     drawScene()
 
-    # And show the scene
+    # Shows the scene
     glFlush()
-    glutSwapBuffers()  # needed for double buffering!
+    glutSwapBuffers()
 
-# Timer: Used to animate the scene when activated:
-
-
+# Timer for animation
 def timer(alarm):
-    glutTimerFunc(0, timer, DELAY)   # Start alarm clock agani
+    glutTimerFunc(0, timer, DELAY)  
     if animate:
-        # Advance to the next frame
+        # Move one frame
         advance()
         glutPostRedisplay()
 
-# Controls the animation. Advances the scene by a single frame
+# Animation of car. Advances the scene by a single frame
 def advance():
-    #Gloabl variable call to get car and wheel x value, displacement modifier, and angle modifier
-    #Gets the min and max values for the displacment
+    # Gloabl variable call to get car and wheel x value, displacement modifier, and angle modifier
+    # Gets the min and max values for the displacment
     global carPosX, carDis, MAX_BOUND, MIN_BOUND, wheelDis, wheelRotation
-    
+
     #Moves the car and wheels 
     carPosX += carDis
     wheelRotation += wheelDis
+
+    #Reverses the displacement if the car reaches the max or min bound
     if(carPosX>MAX_BOUND or carPosX<MIN_BOUND):
         carDis *= -1
         wheelDis *= -1
     glutPostRedisplay()
             
 
-
+# Controls the camera(Left arrow moves camera left, right arrow moves camera right)
 def specialKeys(key, x, y):
     global angleMovement
     if key == GLUT_KEY_LEFT:
@@ -146,7 +138,7 @@ def specialKeys(key, x, y):
         angleMovement -= ANGLE_STEP
     glutPostRedisplay()
 
-# Defines Keyboard controls (Space bar starts animation)
+# Controls the animation (Space bar starts animation)
 def keyboard(key, x, y):
     global angleMovement
     if ord(key) == 27:  
