@@ -12,9 +12,7 @@
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from OpenGL.GL import *
-from PIL import Image
 import sys
-from utils import *
 
 # These parameters define the camera's lens shape
 CAM_NEAR = 0.01
@@ -28,14 +26,6 @@ DEFAULT_STEP = 0.2
 ANGLE_STEP = DEFAULT_STEP
 FPS = 60.0
 DELAY = int(1000.0 / FPS + 0.5)
-
-# Checkerboard dimensions (texture dimensions are powers of 2)
-NROWS = 64
-NCOLS = 64
-
-# Plane dimensions (not airplane - just a flat sheet)
-PLANE_WIDTH = 10
-PLANE_HEIGHT = 10
 
 
 # Global (Module) Variables 
@@ -80,7 +70,7 @@ def main():
 
 
 def init():
-    global cone, cone2, wheel, faceTextureName
+    global cone, cone2, wheel
     # Cones for 
     cone = gluNewQuadric()
     cone2 = gluNewQuadric()
@@ -89,11 +79,6 @@ def init():
     gluQuadricDrawStyle(cone, GLU_LINE)
     gluQuadricDrawStyle(cone2, GLU_LINE)
     gluQuadricDrawStyle(wheel, GLU_LINE)
-
-    generateCheckerBoardTexture()
-    faceTextureName = loadImageTexture("brick.jpg")
-
-
 
 
 # Callback function used to display the scene
@@ -171,69 +156,6 @@ def keyboard(key, x, y):
         animate = not animate  # not animate = True
 
 
-def drawPlane(width, height, texture):
-    """ Draw a textured plane of the specified dimension. """
-    glBindTexture(GL_TEXTURE_2D, texture)
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)  # try GL_DECAL/GL_REPLACE/GL_MODULATE
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)  # try GL_NICEST/GL_FASTEST
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)  # try GL_CLAMP/GL_REPEAT/GL_CLAMP_TO_EDGE
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)  # try GL_LINEAR/GL_NEAREST
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-
-    # Enable/Disable each time or OpenGL ALWAYS expects texturing!
-    glEnable(GL_TEXTURE_2D)
-
-    ex = width / 2
-    sx = -ex
-    ey = height
-    sy = 0
-    glBegin(GL_QUADS)
-    glNormal3f(0, 0, 1)
-    glTexCoord2f(0, 0)
-    glVertex3f(sx, sy, 0)
-    glTexCoord2f(2, 0)
-    glVertex3f(ex, sy, 0)
-    glTexCoord2f(2, 2)
-    glVertex3f(ex, ey, 0)
-    glTexCoord2f(0, 2)
-    glVertex3f(sx, ey, 0)
-    glEnd()
-
-    glDisable(GL_TEXTURE_2D)
-
-
-def drawFloor(width, height, texture):
-    """ Draw a textured floor of the specified dimension. """
-    glBindTexture(GL_TEXTURE_2D, texture)
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)  # try GL_DECAL/GL_REPLACE/GL_MODULATE
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)  # try GL_NICEST/GL_FASTEST
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)  # try GL_CLAMP/GL_REPEAT/GL_CLAMP_TO_EDGE
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)  # try GL_LINEAR/GL_NEAREST
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-
-    sx = width / 2
-    ex = -sx
-    sz = height / 2
-    ez = -sz
-
-    # Enable/Disable each time or OpenGL ALWAYS expects texturing!
-    glEnable(GL_TEXTURE_2D)
-
-    glBegin(GL_QUADS)
-    glTexCoord2f(0, 0)
-    glVertex3f(sx, 0, sz)
-    glTexCoord2f(0, 1)
-    glVertex3f(sx, 0, ez)
-    glTexCoord2f(1, 1)
-    glVertex3f(ex, 0, ez)
-    glTexCoord2f(1, 0)
-    glVertex3f(ex, 0, sz)
-    glEnd()
-
-    glDisable(GL_TEXTURE_2D)
-
 def drawScene():
     
     glMatrixMode(GL_MODELVIEW)
@@ -246,151 +168,64 @@ def drawScene():
 def draw():
     glPushMatrix()
    
-    # #cone1
-    # glPushMatrix()
-    # glTranslated(0, -5, -5)
-    # glRotated(-90, 1, 0, 0)
-    # gluCylinder(cone2, 1, 0.25, 5, 10, 10)
-    # glPopMatrix()
-    #
-    # #cone2
-    # glPushMatrix()
-    # glTranslated(0, -5, 5)
-    # glRotated(-90, 1, 0, 0)
-    # gluCylinder(cone2, 1, 0.25, 5, 10, 10)
-    # glPopMatrix()
-    #
-    # #car body
-    # glPushMatrix()
-    # glTranslated(carPosX, -4, 0)
-    # glScaled(5, 1, 3)
-    # glutWireCube(1.0)
-    # glPopMatrix()
-    #
-    # #car bar
-    # glPushMatrix()
-    # glTranslated(carPosX + 1.5, -3, 0)
-    # glScaled(1, 1, 3)
-    # glutWireCube(1.0)
-    # glPopMatrix()
-    #
-    # #tire front right
-    # glPushMatrix()
-    # glTranslated(carPosX + 1.5, -4, 1.5)
-    # glRotated(wheelRotation, 0, 0, 1)
-    # gluCylinder(wheel, .5, .5, .5, 20, 5)
-    # glPopMatrix()
-    #
-    # #tire front left
-    # glPushMatrix()
-    # glTranslated(carPosX + 1.5, -4, -2)
-    # glRotated(wheelRotation, 0, 0, 1)
-    # gluCylinder(wheel, .5, .5, .5, 20, 5)
-    # glPopMatrix()
-    #
-    # #tire back right
-    # glPushMatrix()
-    # glTranslated(carPosX +  -1.5, -4, 1.5)
-    # glRotated(wheelRotation, 0, 0, 1)
-    # gluCylinder(wheel, .5, .5, .5, 20, 5)
-    # glPopMatrix()
-    #
-    # #tire back left
-    # glPushMatrix()
-    # glTranslated(carPosX +  -1.5, -4, -2)
-    # glRotated(wheelRotation, 0, 0, 1)
-    # gluCylinder(wheel, .5, .5, .5, 20, 5)
-    # glPopMatrix()
-
+    #cone1
     glPushMatrix()
-    drawFloor(PLANE_WIDTH, PLANE_HEIGHT, checkerBoardName)
+    glTranslated(0, -5, -5)
+    glRotated(-90, 1, 0, 0)
+    gluCylinder(cone2, 1, 0.25, 5, 10, 10)
     glPopMatrix()
 
+    #cone2
     glPushMatrix()
-    glRotated(90, 0, 1, 0)
-    glTranslated(0, 0, 5)
-    drawPlane(PLANE_WIDTH, PLANE_HEIGHT, faceTextureName)
+    glTranslated(0, -5, 5)
+    glRotated(-90, 1, 0, 0)
+    gluCylinder(cone2, 1, 0.25, 5, 10, 10)
     glPopMatrix()
 
+    #car body
     glPushMatrix()
-    glRotated(90, 0, 1, 0)
-    glTranslated(0, 0, -5)
-    drawPlane(PLANE_WIDTH, PLANE_HEIGHT, faceTextureName)
+    glTranslated(carPosX, -4, 0)
+    glScaled(5, 1, 3)
+    glutWireCube(1.0)
     glPopMatrix()
 
+    #car bar
     glPushMatrix()
-    glRotated(180, 0, 1, 0)
-    glTranslated(0, 0, 5)
-    drawPlane(PLANE_WIDTH, PLANE_HEIGHT, faceTextureName)
+    glTranslated(carPosX + 1.5, -3, 0)
+    glScaled(1, 1, 3)
+    glutWireCube(1.0)
     glPopMatrix()
 
-    # fourth wall but blocks view so commented out for now
-    # glPushMatrix()
-    # glRotated(180, 0, 1, 0)
-    # glTranslated(0, 0, -5)
-    # drawPlane(PLANE_WIDTH, PLANE_HEIGHT, faceTextureName)
-    # glPopMatrix()
+    #tire front right
+    glPushMatrix()
+    glTranslated(carPosX + 1.5, -4, 1.5)
+    glRotated(wheelRotation, 0, 0, 1)
+    gluCylinder(wheel, .5, .5, .5, 20, 5)
+    glPopMatrix()
+
+    #tire front left
+    glPushMatrix()
+    glTranslated(carPosX + 1.5, -4, -2)
+    glRotated(wheelRotation, 0, 0, 1)
+    gluCylinder(wheel, .5, .5, .5, 20, 5)
+    glPopMatrix()
+
+    #tire back right
+    glPushMatrix()
+    glTranslated(carPosX +  -1.5, -4, 1.5)
+    glRotated(wheelRotation, 0, 0, 1)
+    gluCylinder(wheel, .5, .5, .5, 20, 5)
+    glPopMatrix()
+
+    #tire back left
+    glPushMatrix()
+    glTranslated(carPosX +  -1.5, -4, -2)
+    glRotated(wheelRotation, 0, 0, 1)
+    gluCylinder(wheel, .5, .5, .5, 20, 5)
+    glPopMatrix()
 
     glPopMatrix()
 
-
-def generateCheckerBoardTexture():
-    """
-    * Generate a texture in the form of a checkerboard
-    * Why?  Simple to do...
-    """
-    global checkerBoardName
-    texture = [0] * (NROWS * NCOLS * 4)
-    for i in range(NROWS):
-        for j in range(NCOLS):
-            c = 0 if ((i & 8) ^ (j & 8)) else 255
-            idx = (i * NCOLS + j) * 4
-            texture[idx] = c  # Red
-            texture[idx + 1] = c  # Green
-            texture[idx + 2] = c  # Blue
-            texture[idx + 3] = 150  # Alpha (transparency)
-
-    # Generate a "name" for the texture.
-    # Bind this texture as current active texture
-    # and sets the parameters for this texture.
-    checkerBoardName = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, checkerBoardName)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NCOLS, NROWS, 0, GL_RGBA,
-                 GL_UNSIGNED_BYTE, texture)
-
-
-def loadConcreteTexture():
-    global concreteTextureName
-
-    # Load the image and crop it to the proper 128x128 (or edit the file!)
-    im = Image.open("concrete.jpg")
-    print("Concrete dimensions: {0}".format(im.size))  # If you want to see the image's original dimensions
-    dim = 128
-    size = (0, 0, dim, dim)
-    texture = im.crop(size).tobytes("raw")  # The cropped texture
-
-    concreteTextureName = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, concreteTextureName)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, dim, dim, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, texture)
-
-
-def loadImageTexture(filename):
-    # Load the image from the file and return as a texture
-    im = Image.open(filename)
-    print("Concrete dimensions: {0}".format(im.size))  # If you want to see the image's original dimensions
-    # dim = 128
-    # size = (0,0,dim,dim)
-    # texture = im.crop(size).tobytes("raw")   # The cropped texture
-    texture = im.tobytes("raw")  # The cropped texture
-    dimX = im.size[0]
-    dimY = im.size[1]
-
-    returnTextureName = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, returnTextureName)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, dimX, dimY, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, texture)
-    return returnTextureName
 
 if __name__ == '__main__':
     main()
